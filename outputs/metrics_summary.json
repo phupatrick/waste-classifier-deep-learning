@@ -1,0 +1,16 @@
+{
+  "best_val_acc": 0.6180371352785146,
+  "test_accuracy": 0.5807291666666666,
+  "test_macro_f1": 0.5104098777413597,
+  "test_weighted_f1": 0.5583545618170319,
+  "num_classes": 6,
+  "class_names": [
+    "cardboard",
+    "glass",
+    "metal",
+    "paper",
+    "plastic",
+    "trash"
+  ],
+  "device": "cpu"
+}
