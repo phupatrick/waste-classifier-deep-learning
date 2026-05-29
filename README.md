@@ -2,6 +2,8 @@
 
 Project này triển khai mô hình CNN bằng Python, NumPy, Pandas và PyTorch để phân loại ảnh rác thải sinh hoạt. Sau khi huấn luyện, mô hình được tích hợp vào ứng dụng web Streamlit để demo dự đoán ảnh thực tế.
 
+File `PROJECT_REQUIREMENTS.md` liệt kê rõ project đáp ứng từng yêu cầu của đề bài.
+
 ## 1. Cấu trúc thư mục
 
 ```text
