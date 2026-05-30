@@ -6,17 +6,18 @@ from PIL import Image
 
 try:
     from .data_utils import build_transforms
-    from .model import WasteCNN
+    from .model import build_model
 except ImportError:
     from data_utils import build_transforms
-    from model import WasteCNN
+    from model import build_model
 
 
 def load_model(model_path: str, device):
     checkpoint = torch.load(model_path, map_location=device)
     class_names = checkpoint["class_names"]
     image_size = checkpoint.get("image_size", 224)
-    model = WasteCNN(num_classes=len(class_names)).to(device)
+    architecture = checkpoint.get("architecture", "custom_cnn")
+    model = build_model(num_classes=len(class_names), architecture=architecture, pretrained=False).to(device)
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
     return model, class_names, image_size

@@ -28,6 +28,8 @@ Kiến trúc chính:
 - `Dropout` để giảm overfitting.
 - `Linear` để phân loại 6 lớp rác.
 
+Project cũng hỗ trợ MobileNetV2 transfer learning. MobileNetV2 vẫn là kiến trúc CNN, được dùng để tăng độ chính xác demo trên dataset nhỏ.
+
 Các lớp rác:
 
 - cardboard

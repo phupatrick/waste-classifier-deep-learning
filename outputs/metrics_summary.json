@@ -1,8 +1,8 @@
 {
-  "best_val_acc": 0.6180371352785146,
-  "test_accuracy": 0.5807291666666666,
-  "test_macro_f1": 0.5104098777413597,
-  "test_weighted_f1": 0.5583545618170319,
+  "best_val_acc": 0.8275862068965517,
+  "test_accuracy": 0.8411458333333334,
+  "test_macro_f1": 0.8086289206491326,
+  "test_weighted_f1": 0.8399918897820621,
   "num_classes": 6,
   "class_names": [
     "cardboard",
@@ -12,5 +12,7 @@
     "plastic",
     "trash"
   ],
-  "device": "cpu"
+  "device": "cpu",
+  "architecture": "mobilenet_v2",
+  "pretrained": true
 }

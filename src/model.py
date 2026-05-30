@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from torchvision import models
 
 
 class WasteCNN(nn.Module):
@@ -41,3 +42,25 @@ class WasteCNN(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.features(x)
         return self.classifier(x)
+
+
+def build_model(num_classes: int, architecture: str = "custom_cnn", pretrained: bool = False):
+    if architecture == "custom_cnn":
+        return WasteCNN(num_classes=num_classes)
+
+    if architecture == "mobilenet_v2":
+        weights = models.MobileNet_V2_Weights.DEFAULT if pretrained else None
+        model = models.mobilenet_v2(weights=weights)
+
+        if pretrained:
+            for parameter in model.features.parameters():
+                parameter.requires_grad = False
+
+        in_features = model.classifier[1].in_features
+        model.classifier = nn.Sequential(
+            nn.Dropout(p=0.3),
+            nn.Linear(in_features, num_classes),
+        )
+        return model
+
+    raise ValueError(f"Unsupported architecture: {architecture}")

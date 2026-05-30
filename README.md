@@ -2,7 +2,7 @@
 
 Project này triển khai mô hình CNN bằng Python, NumPy, Pandas và PyTorch để phân loại ảnh rác thải sinh hoạt. Sau khi huấn luyện, mô hình được tích hợp vào ứng dụng web Streamlit để demo dự đoán ảnh thực tế.
 
-File `PROJECT_REQUIREMENTS.md` liệt kê rõ project đáp ứng từng yêu cầu của đề bài.
+File `Checklist đáp ứng yêu cầu đồ án.md` liệt kê rõ project đáp ứng từng yêu cầu của đề bài.
 
 ## 1. Cấu trúc thư mục
 
@@ -81,6 +81,12 @@ Nếu máy có GPU NVIDIA và CUDA, nên cài PyTorch theo hướng dẫn chính
 python src/train.py --data_dir data --epochs 20 --batch_size 32 --image_size 224
 ```
 
+Nếu muốn kết quả tốt hơn cho demo, dùng transfer learning với MobileNetV2:
+
+```bash
+python src/train.py --data_dir data --epochs 10 --batch_size 32 --image_size 160 --architecture mobilenet_v2 --pretrained --class_weights --lr 0.001
+```
+
 Sau khi chạy xong, thư mục `outputs/` sẽ có:
 
 - `best_model.pth`: model tốt nhất theo validation accuracy.
@@ -110,7 +116,7 @@ streamlit run app.py
 - Bài toán: phân loại ảnh rác sinh hoạt để hỗ trợ tái chế.
 - Tiền xử lý: resize ảnh về `224x224`, chuyển tensor, chuẩn hóa theo mean/std.
 - Tăng cường dữ liệu: lật ngang, xoay nhẹ, thay đổi sáng/tương phản.
-- Kiến trúc: CNN gồm nhiều khối `Conv2D -> BatchNorm -> ReLU -> MaxPool`, sau đó là `AdaptiveAvgPool`, `Dropout`, `Linear`.
+- Kiến trúc: CNN tự xây gồm nhiều khối `Conv2D -> BatchNorm -> ReLU -> MaxPool`, hoặc MobileNetV2 transfer learning để demo chính xác hơn.
 - Loss function: `CrossEntropyLoss`, phù hợp bài toán phân loại nhiều lớp.
 - Optimizer: `Adam`, learning rate mặc định `0.001`.
 - Đánh giá: Accuracy, Macro F1, Weighted F1, Classification Report, Confusion Matrix.

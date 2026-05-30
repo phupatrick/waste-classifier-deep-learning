@@ -10,12 +10,12 @@ from torch import nn, optim
 try:
     from .data_utils import build_dataloaders
     from .metrics import classification_metrics
-    from .model import WasteCNN
+    from .model import build_model
     from .plots import plot_confusion_matrix, plot_training_history
 except ImportError:
     from data_utils import build_dataloaders
     from metrics import classification_metrics
-    from model import WasteCNN
+    from model import build_model
     from plots import plot_confusion_matrix, plot_training_history
 
 
@@ -29,6 +29,9 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--num_workers", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--architecture", choices=["custom_cnn", "mobilenet_v2"], default="custom_cnn")
+    parser.add_argument("--pretrained", action="store_true", help="Use pretrained ImageNet weights when available.")
+    parser.add_argument("--class_weights", action="store_true", help="Balance loss for uneven class counts.")
     return parser.parse_args()
 
 
@@ -95,9 +98,22 @@ def main():
         args.data_dir, args.image_size, args.batch_size, args.num_workers
     )
 
-    model = WasteCNN(num_classes=len(class_names)).to(device)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    model = build_model(
+        num_classes=len(class_names),
+        architecture=args.architecture,
+        pretrained=args.pretrained,
+    ).to(device)
+
+    if args.class_weights:
+        targets = np.array(train_loader.dataset.targets)
+        counts = np.bincount(targets, minlength=len(class_names))
+        weights = counts.sum() / np.maximum(counts, 1)
+        weights = weights / weights.mean()
+        criterion = nn.CrossEntropyLoss(weight=torch.tensor(weights, dtype=torch.float32, device=device))
+    else:
+        criterion = nn.CrossEntropyLoss()
+
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", patience=3, factor=0.5)
 
     best_val_acc = 0.0
@@ -132,6 +148,8 @@ def main():
                     "class_names": class_names,
                     "image_size": args.image_size,
                     "val_acc": best_val_acc,
+                    "architecture": args.architecture,
+                    "pretrained": args.pretrained,
                 },
                 best_model_path,
             )
@@ -163,6 +181,8 @@ def main():
         "num_classes": len(class_names),
         "class_names": class_names,
         "device": str(device),
+        "architecture": args.architecture,
+        "pretrained": args.pretrained,
     }
     with open(output_dir / "metrics_summary.json", "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
